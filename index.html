@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Tiêu đề mới cho trang dashboard -->
+    <title>SBS AI Programs Dashboard</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Sử dụng font Inter */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* Nền màu xanh đen đậm (slate-900) */
+            color: #f1f5f9; /* Chữ màu sáng (slate-100) */
+            scroll-behavior: smooth;
+        }
+        /* Tạo hiệu ứng gradient cho tiêu đề */
+        .gradient-text {
+            background-image: linear-gradient(to right, #38bdf8, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        /* Tùy chỉnh thanh cuộn */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b; /* slate-800 */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155; /* slate-700 */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569; /* slate-600 */
+        }
+        /* CSS cho biểu đồ Donut (Đánh giá) - Giữ nguyên từ file cũ */
+        @property --p{
+          syntax: '<number>';
+          inherits: true;
+          initial-value: 0;
+        }
+        .pie {
+          --p:20;
+          --b:22px;
+          --c: #38bdf8; /* sky-500 */
+          --w:150px;
+
+          width: var(--w);
+          aspect-ratio: 1;
+          position: relative;
+          display: inline-grid;
+          margin: 5px;
+          place-content: center;
+          font-size: 1.5em;
+          font-weight: bold;
+          color: var(--c);
+        }
+        .pie:before,
+        .pie:after {
+          content: "";
+          position: absolute;
+          border-radius: 50%;
+        }
+        .pie:before {
+          inset: 0;
+          background:
+            radial-gradient(farthest-side,var(--c) 98%,#0000) top/var(--b) var(--b) no-repeat,
+            conic-gradient(var(--c) calc(var(--p)*1%),#0000 0);
+          -webkit-mask: radial-gradient(farthest-side,#0000 calc(99% - var(--b)),#000 calc(100% - var(--b)));
+                  mask: radial-gradient(farthest-side,#0000 calc(99% - var(--b)),#000 calc(100% - var(--b)));
+        }
+        .pie:after {
+          inset: calc(50% - var(--b)/2);
+          background: var(--c);
+          transform: rotate(calc(var(--p)*3.6deg)) translateY(calc(50% - var(--w)/2));
+        }
+        .animate {
+          animation: p 1s .5s both;
+        }
+        @keyframes p{
+          from{--p:0}
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Nút Quay lại Menu (dùng chung cho các trang con) -->
+    <button class="back-to-menu fixed top-4 left-4 z-50 bg-slate-700/50 text-white px-4 py-2 rounded-full backdrop-blur-sm border border-slate-600 hover:bg-slate-600 transition-all hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 inline-block mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+        </svg>
+        Quay lại Menu
+    </button>
+
+    <!-- TRANG CHÍNH / MENU (Visible by default) -->
+    <div id="main-menu" class="container mx-auto max-w-6xl p-4 md:p-8">
+        <header class="text-center mb-12 md:mb-16">
+            <h1 class="text-4xl md:text-6xl font-extrabold gradient-text mb-4">
+                SBS AI Learning System
+            </h1>
+            <h2 class="text-xl md:text-2xl font-semibold text-slate-300">
+                AI-powered learning — interactive, personalized, and real.
+            </h2>
+        </header>
+
+        <!-- Lựa chọn 2 chương trình -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+            <!-- Box 1: Core AI Program -->
+            <div id="show-core-ai" class="bg-slate-800 p-8 rounded-2xl border-2 border-slate-700 hover:border-sky-500 shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105">
+                <h3 class="text-3xl font-bold text-sky-400 mb-4">SBS Core.AI Program</h3>
+                <p class="text-slate-300 text-lg mb-6">Chương trình 8 buổi thực chiến, tập trung vào kỹ năng và dự án AI ứng dụng cho mọi sinh viên SBS.</p>
+                <span class="font-semibold text-white">Xem chi tiết &rarr;</span>
+            </div>
+
+            <!-- Box 2: AI Learning Roadmap -->
+            <div id="show-roadmap" class="bg-slate-800 p-8 rounded-2xl border-2 border-slate-700 hover:border-purple-500 shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105">
+                <h3 class="text-3xl font-bold text-purple-400 mb-4">SBS AI Learning Integration Roadmap</h3>
+                <p class="text-slate-300 text-lg mb-6">Lộ trình tích hợp AI vào chương trình học, cá nhân hóa trải nghiệm cho ngành Quản trị Kinh doanh và Khách sạn.</p>
+                <span class="font-semibold text-white">Xem chi tiết &rarr;</span>
+            </div>
+        </div>
+
+        <!-- Phần Kết quả & Truyền thông -->
+        <section>
+            <h3 class="flex items-center text-3xl font-bold mb-8 text-slate-100">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 mr-3 text-fuchsia-400">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688 0-1.25.561-1.25 1.25 0 .688.562 1.25 1.25 1.25.688 0 1.25-.562 1.25-1.25 0-.688-.562-1.25-1.25-1.25zM10.34 11.34c-.688 0-1.25.561-1.25 1.25 0 .688.562 1.25 1.25 1.25.688 0 1.25-.562 1.25-1.25 0-.688-.562-1.25-1.25-1.25zM10.34 6.84c-.688 0-1.25.561-1.25 1.25 0 .688.562 1.25 1.25 1.25.688 0 1.25-.562 1.25-1.25 0-.688-.562-1.25-1.25-1.25zM15 15.84c-.688 0-1.25.561-1.25 1.25 0 .688.562 1.25 1.25 1.25.688 0 1.25-.562 1.25-1.25 0-.688-.562-1.25-1.25-1.25zM15 11.34c-.688 0-1.25.561-1.25 1.25 0 .688.562 1.25 1.25 1.25.688 0 1.25-.562 1.25-1.25 0-.688-.562-1.25-1.25-1.25zM15 6.84c-.688 0-1.25.561-1.25 1.25 0 .688.562 1.25 1.25 1.25.688 0 1.25-.562 1.25-1.25 0-.688-.562-1.25-1.25-1.25zM4.66 15.84c-.688 0-1.25.561-1.25 1.25 0 .688.562 1.25 1.25 1.25.688 0 1.25-.562 1.25-1.25 0-.688-.562-1.25-1.25-1.25zM4.66 11.34c-.688 0-1.25.561-1.25 1.25 0 .688.562 1.25 1.25 1.25.688 0 1.25-.562 1.25-1.25 0-.688-.562-1.25-1.25-1.25zM4.66 6.84c-.688 0-1.25.561-1.25 1.25 0 .688.562 1.25 1.25 1.25.688 0 1.25-.562 1.25-1.25 0-.688-.562-1.25-1.25-1.25zM19.34 15.84c-.688 0-1.25.561-1.25 1.25 0 .688.562 1.25 1.25 1.25.688 0 1.25-.562 1.25-1.25 0-.688-.562-1.25-1.25-1.25zM19.34 11.34c-.688 0-1.25.561-1.25 1.25 0 .688.562 1.25 1.25 1.25.688 0 1.25-.562 1.25-1.25 0-.688-.562-1.25-1.25-1.25zM19.34 6.84c-.688 0-1.25.561-1.25 1.25 0 .688.562 1.25 1.25 1.25.688 0 1.25-.562 1.25-1.25 0-.688-.562-1.25-1.25-1.25z" />
+                </svg>
+                🌟 Kết quả & Truyền thông
+            </h3>
+            <div class="bg-slate-800 p-8 rounded-xl border border-slate-700/50 shadow-lg">
+                <h4 class="text-2xl font-bold text-slate-100 mb-4">SBS Smart Learning System</h4>
+                <p class="text-lg italic text-slate-400 mb-6">“AI-powered learning — interactive, personalized, and real.”</p>
+                <h5 class="text-xl font-semibold text-slate-200 mb-4">Điểm nổi bật truyền thông:</h5>
+                <ul class="list-disc list-inside text-slate-300 space-y-3">
+                    <li>Học với video AI sinh động, quiz tương tác, chatbot cá nhân hóa.</li>
+                    <li>Mỗi sinh viên có “AI Learning Buddy” – thẻ học và phản hồi riêng.</li>
+                    <li>Cầu nối giữa thực hành nghề nghiệp và trí tuệ nhân tạo học tập.</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <!-- NỘI DUNG CHƯƠNG TRÌNH CORE.AI (Hidden by default) -->
+    <!-- Đây là toàn bộ nội dung infographic cũ của bạn -->
+    <div id="core-ai-program" class="hidden">
+        <div class="container mx-auto max-w-6xl p-4 md:p-8 pt-20"> <!-- Thêm padding top để không bị nút back che -->
+
+            <!-- TIÊU ĐỀ CHÍNH -->
+            <header class="text-center mb-12 md:mb-16">
+                <h1 class="text-4xl md:text-6xl font-extrabold gradient-text mb-4">
+                    SBS Core.AI Program
+                </h1>
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-200 mb-6">
+                    "Think Smart. Create Real. Work with AI."
+                </h2>
+                <div class="flex justify-center gap-4 flex-wrap">
+                    <span class="bg-sky-600/20 text-sky-300 px-4 py-2 rounded-full font-semibold border border-sky-500/30">
+                        8 Sessions
+                    </span>
+                    <span class="bg-indigo-600/20 text-indigo-300 px-4 py-2 rounded-full font-semibold border border-indigo-500/30">
+                        Hands-on
+                    </span>
+                    <span class="bg-purple-600/20 text-purple-300 px-4 py-2 rounded-full font-semibold border border-purple-500/30">
+                        Project-based
+                    </span>
+                    <span class="bg-fuchsia-600/20 text-fuchsia-300 px-4 py-2 rounded-full font-semibold border border-fuchsia-500/30">
+                        For all SBS majors
+                    </span>
+                </div>
+            </header>
+
+            <!-- MỤC TIÊU CHƯƠNG TRÌNH -->
+            <section class="mb-12 md:mb-16">
+                <h3 class="flex items-center text-3xl font-bold mb-8 text-slate-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 mr-3 text-sky-400">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.31h5.375c.497 0 .73.656.343.98l-4.338 3.14a.563.563 0 00-.183.64l1.638 4.796a.563.563 0 01-.81.618l-4.338-3.14a.563.563 0 00-.676 0l-4.338 3.14a.563.563 0 01-.81-.618l1.638-4.796A.563.563 0 003.465 9.9l-4.338-3.14a.563.563 0 01.343-.98h5.375a.563.563 0 00.475-.31l2.125-5.11z" />
+                    </svg>
+                    Mục tiêu chương trình
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700/50 shadow-lg">
+                        <p class="text-lg text-slate-300">Hiểu rõ AI đang <span class="font-semibold text-sky-300">thay đổi</span> cách học, cách làm và cách sáng tạo.</p>
+                    </div>
+                    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700/50 shadow-lg">
+                        <p class="text-lg text-slate-300">Sử dụng AI như một <span class="font-semibold text-indigo-300">công cụ chuyên nghiệp</span> để học, nghiên cứu và làm việc.</p>
+                    </div>
+                    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700/50 shadow-lg">
+                        <p class="text-lg text-slate-300">Tự <span class="font-semibold text-purple-300">thiết kế và trình bày</span> một dự án AI ứng dụng thực tế (AI Applied Project).</p>
+                    </div>
+                    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700/50 shadow-lg">
+                        <p class="text-lg text-slate-300">Hình thành <span class="font-semibold text-fuchsia-300">thái độ đúng đắn và đạo đức</span> khi dùng AI.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CẤU TRÚC CHƯƠNG TRÌNH (TIMELINE) -->
+            <section class="mb-12 md:mb-16">
+                <h3 class="flex items-center text-3xl font-bold mb-10 text-slate-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 mr-3 text-indigo-400">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-18 0h18" />
+                    </svg>
+                    Lộ trình 8 buổi học
+                </h3>
+
+                <!-- Timeline wrapper -->
+                <div class="relative">
+                    <!-- Đường kẻ dọc -->
+                    <div class="absolute left-6 md:left-1/2 top-0 h-full w-1 bg-slate-700 -ml-0.5 rounded-full"></div>
+
+                    <!-- Giai đoạn 1: Learn & Practice -->
+                    <div class="mb-8 relative">
+                        <div class="flex justify-center md:justify-start md:w-1/2 md:pr-12">
+                            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 mb-4 w-full md:text-right">
+                                <h4 class="text-xl font-bold text-sky-400">Giai đoạn 1: Learn & Practice</h4>
+                                <p class="text-slate-400">(5 Buổi)</p>
+                            </div>
+                        </div>
+                        <div class="absolute left-6 md:left-1/2 top-4 w-4 h-4 bg-sky-400 rounded-full -ml-2 border-4 border-slate-900"></div>
+                    </div>
+
+                    <!-- Buổi 1 -->
+                    <div class="mb-8 flex justify-between items-center w-full right-timeline">
+                        <div class="md:w-1/2"></div>
+                        <div class="z-10 absolute left-6 md:left-1/2">
+                            <div class="flex items-center justify-center w-8 h-8 bg-slate-700 text-slate-200 rounded-full font-bold -ml-4">1</div>
+                        </div>
+                        <div class="bg-slate-800 rounded-xl border border-slate-700/50 shadow-lg p-6 w-full md:w-1/2 ml-10 md:ml-0 md:pl-12">
+                            <h4 class="text-lg font-bold text-slate-100 mb-1">The World with AI</h4>
+                            <p class="text-sm text-slate-400 mb-2">Thảo luận case thật theo ngành (Business, Hospitality, Design, Data).</p>
+                            <p class="text-slate-300"><span class="font-semibold text-sky-300">Kết quả:</span> Nhóm phân tích “AI đang chạm vào ngành tôi thế nào?”</p>
+                        </div>
+                    </div>
+
+                    <!-- Buổi 2 -->
+                    <div class="mb-8 flex justify-between flex-row-reverse items-center w-full left-timeline">
+                        <div class="md:w-1/2"></div>
+                        <div class="z-10 absolute left-6 md:left-1/2">
+                            <div class="flex items-center justify-center w-8 h-8 bg-slate-700 text-slate-200 rounded-full font-bold -ml-4">2</div>
+                        </div>
+                        <div class="bg-slate-800 rounded-xl border border-slate-700/50 shadow-lg p-6 w-full md:w-1/2 mr-10 md:mr-0 md:pr-12 ml-10 md:ml-0">
+                            <h4 class="text-lg font-bold text-slate-100 mb-1">Smart Tools & Prompt Skills</h4>
+                            <p class="text-sm text-slate-400 mb-2">Tư duy cộng tác với AI – nghệ thuật ra lệnh (prompt).</p>
+                            <p class="text-slate-300"><span class="font-semibold text-sky-300">Kết quả:</span> “Prompt Battle” – nhóm ra lệnh để AI hoàn thành task thật.</p>
+                        </div>
+                    </div>
+
+                    <!-- Buổi 3 -->
+                    <div class="mb-8 flex justify-between items-center w-full right-timeline">
+                        <div class="md:w-1/2"></div>
+                        <div class="z-10 absolute left-6 md:left-1/2">
+                            <div class="flex items-center justify-center w-8 h-8 bg-slate-700 text-slate-200 rounded-full font-bold -ml-4">3</div>
+                        </div>
+                        <div class="bg-slate-800 rounded-xl border border-slate-700/50 shadow-lg p-6 w-full md:w-1/2 ml-10 md:ml-0 md:pl-12">
+                            <h4 class="text-lg font-bold text-slate-100 mb-1">Create with AI</h4>
+                            <p class="text-sm text-slate-400 mb-2">Ứng dụng AI trong sáng tạo, học tập & phân tích.</p>
+                            <p class="text-slate-300"><span class="font-semibold text-sky-300">Kết quả:</span> Tạo 1 sản phẩm thực tế (Poster, Market plan, Chatbot, Dashboard).</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Buổi 4 -->
+                    <div class="mb-8 flex justify-between flex-row-reverse items-center w-full left-timeline">
+                        <div class="md:w-1/2"></div>
+                        <div class="z-10 absolute left-6 md:left-1/2">
+                            <div class="flex items-center justify-center w-8 h-8 bg-slate-700 text-slate-200 rounded-full font-bold -ml-4">4</div>
+                        </div>
+                        <div class="bg-slate-800 rounded-xl border border-slate-700/50 shadow-lg p-6 w-full md:w-1/2 mr-10 md:mr-0 md:pr-12 ml-10 md:ml-0">
+                            <h4 class="text-lg font-bold text-slate-100 mb-1">AI in Research & Study</h4>
+                            <p class="text-sm text-slate-400 mb-2">Dùng AI trong học thuật: tìm, tóm tắt, phân tích & trích dẫn.</p>
+                            <p class="text-slate-300"><span class="font-semibold text-sky-300">Kết quả:</span> Luyện “AI-assisted literature review” + viết phản tư ngắn.</p>
+                        </div>
+                    </div>
+
+                    <!-- Buổi 5 -->
+                    <div class="mb-8 flex justify-between items-center w-full right-timeline">
+                        <div class="md:w-1/2"></div>
+                        <div class="z-10 absolute left-6 md:left-1/2">
+                            <div class="flex items-center justify-center w-8 h-8 bg-slate-700 text-slate-200 rounded-full font-bold -ml-4">5</div>
+                        </div>
+                        <div class="bg-slate-800 rounded-xl border border-slate-700/50 shadow-lg p-6 w-full md:w-1/2 ml-10 md:ml-0 md:pl-12">
+                            <h4 class="text-lg font-bold text-slate-100 mb-1">Responsible & Ethical AI</h4>
+                            <p class="text-sm text-slate-400 mb-2">Đạo đức, sai lệch, deepfake, sở hữu trí tuệ.</p>
+                            <p class="text-slate-300"><span class="font-semibold text-sky-300">Kết quả:</span> Workshop “AI Dilemma Game” xử lý tình huống thật.</p>
+                        </div>
+                    </div>
+
+                    <!-- Giai đoạn 2: Project -->
+                    <div class="mb-8 relative">
+                        <div class="flex justify-center md:justify-end md:w-1/2 md:pl-12 ml-auto">
+                            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 mb-4 w-full md:text-left">
+                                <h4 class="text-xl font-bold text-purple-400">Giai đoạn 2: Project</h4>
+                                <p class="text-slate-400">(3 Buổi)</p>
+                            </div>
+                        </div>
+                        <div class="absolute left-6 md:left-1/2 top-4 w-4 h-4 bg-purple-400 rounded-full -ml-2 border-4 border-slate-900"></div>
+                    </div>
+                    
+                    <!-- Buổi 6 -->
+                    <div class="mb-8 flex justify-between flex-row-reverse items-center w-full left-timeline">
+                        <div class="md:w-1/2"></div>
+                        <div class="z-10 absolute left-6 md:left-1/2">
+                            <div class="flex items-center justify-center w-8 h-8 bg-slate-700 text-slate-200 rounded-full font-bold -ml-4">6</div>
+                        </div>
+                        <div class="bg-slate-800 rounded-xl border border-slate-700/50 shadow-lg p-6 w-full md:w-1/2 mr-10 md:mr-0 md:pr-12 ml-10 md:ml-0">
+                            <h4 class="text-lg font-bold text-slate-100 mb-1">Project Sprint – Ideation & Design</h4>
+                            <p class="text-sm text-slate-400 mb-2">Xây dựng ý tưởng dự án AI ứng dụng.</p>
+                            <p class="text-slate-300"><span class="font-semibold text-purple-300">Kết quả:</span> Xác định vấn đề, giải pháp, công cụ AI sử dụng.</p>
+                        </div>
+                    </div>
+
+                    <!-- Buổi 7 -->
+                    <div class="mb-8 flex justify-between items-center w-full right-timeline">
+                        <div class="md:w-1/2"></div>
+                        <div class="z-10 absolute left-6 md:left-1/2">
+                            <div class="flex items-center justify-center w-8 h-8 bg-slate-700 text-slate-200 rounded-full font-bold -ml-4">7</div>
+                        </div>
+                        <div class="bg-slate-800 rounded-xl border border-slate-700/50 shadow-lg p-6 w-full md:w-1/2 ml-10 md:ml-0 md:pl-12">
+                            <h4 class="text-lg font-bold text-slate-100 mb-1">Project Development – Make it Work</h4>
+                            <p class="text-sm text-slate-400 mb-2">Phát triển và hoàn thiện sản phẩm.</p>
+                            <p class="text-slate-300"><span class="font-semibold text-purple-300">Kết quả:</span> Sản phẩm thử nghiệm (prototype / demo / report).</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Buổi 8 -->
+                    <div class="mb-8 flex justify-between flex-row-reverse items-center w-full left-timeline">
+                        <div class="md:w-1/2"></div>
+                        <div class="z-10 absolute left-6 md:left-1/2">
+                            <div class="flex items-center justify-center w-8 h-8 bg-slate-700 text-slate-200 rounded-full font-bold -ml-4">8</div>
+                        </div>
+                        <div class="bg-slate-800 rounded-xl border border-slate-700/50 shadow-lg p-6 w-full md:w-1/2 mr-10 md:mr-0 md:pr-12 ml-10 md:ml-0">
+                            <h4 class="text-lg font-bold text-slate-100 mb-1">Showcase & Reflection</h4>
+                            <p class="text-sm text-slate-400 mb-2">Trình bày dự án & rút kinh nghiệm.</p>
+                            <p class="text-slate-300"><span class="font-semibold text-purple-300">Kết quả:</span> AI Applied Project + Reflection Report.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- DỰ ÁN & ĐÁNH GIÁ (Layout 2 cột) -->
+            <section class="mb-12 md:mb-16 grid grid-cols-1 lg:grid-cols-2 gap-12">
+
+                <!-- Cột 1: DỰ ÁN TRUNG TÂM -->
+                <div>
+                    <h3 class="flex items-center text-3xl font-bold mb-8 text-slate-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 mr-3 text-purple-400">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM18 13.5l.375 1.5L18 16.5l-.375-1.5-.375-1.5 1.5.375 1.5-.375z" />
+                        </svg>
+                        Dự án: AI Applied Project
+                    </h3>
+                    
+                    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700/50 shadow-lg mb-6">
+                        <h4 class="text-xl font-semibold text-purple-300 mb-2">🎯 Yêu cầu</h4>
+                        <ul class="list-disc list-inside text-slate-300 space-y-2">
+                            <li>Nhóm 3–4 sinh viên</li>
+                            <li>Dự án mô phỏng ứng dụng AI trong lĩnh vực học</li>
+                            <li>Kết quả: Sản phẩm thực tế + Báo cáo quy trình (1 trang)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700/50 shadow-lg">
+                        <h4 class="text-xl font-semibold text-purple-300 mb-4">💡 Gợi ý chủ đề</h4>
+                        <div class="space-y-4">
+                            <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-sky-300">Business</h5>
+                                <p class="text-slate-300 text-sm">AI Marketing Plan, AI-driven customer insight, Digital ad generator.</p>
+                            </div>
+                            <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-indigo-300">Hospitality</h5>
+                                <p class="text-slate-300 text-sm">AI Chatbot for Guest Services, Predictive Review Analysis.</p>
+                            </div>
+                            <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-fuchsia-300">Data</h5>
+                                <p class="text-slate-300 text-sm">AI Dashboard for Trend Forecasting.</p>
+                            </div>
+                            <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-rose-300">Design</h5>
+                                <p class="text-slate-300 text-sm">AI Co-Designer: tạo brand concept, moodboard, poster tự động.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cột 2: ĐÁNH GIÁ -->
+                <div>
+                    <h3 class="flex items-center text-3xl font-bold mb-8 text-slate-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 mr-3 text-fuchsia-400">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 100 15 7.5 7.5 0 000-15zM21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                        Đánh giá
+                    </h3>
+                    
+                    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700/50 shadow-lg">
+                        <div class="flex flex-wrap justify-center items-center gap-6 text-center">
+                            <!-- Biểu đồ Donut -->
+                            <div class="pie animate" style="--p:40;--c:#c084fc;--b:15px">40%</div>
+                            <div class="pie animate" style="--p:25;--c:#818cf8;--b:15px">25%</div>
+                            <div class="pie animate" style="--p:25;--c:#38bdf8;--b:15px">25%</div>
+                            <div class="pie animate" style="--p:10;--c:#f472b6;--b:15px">10%</div>
+                        </div>
+                        
+                        <div class="mt-8 space-y-4">
+                            <div class="flex items-center">
+                                <span class="w-4 h-4 rounded-full bg-purple-400 mr-3"></span>
+                                <span class="font-semibold text-slate-200">AI Applied Project (40%)</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-4 h-4 rounded-full bg-indigo-400 mr-3"></span>
+                                <span class="font-semibold text-slate-200">Workshop Participation (25%)</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-4 h-4 rounded-full bg-sky-400 mr-3"></span>
+                                <span class="font-semibold text-slate-200">Mini Assignments (25%)</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-4 h-4 rounded-full bg-pink-400 mr-3"></span>
+                                <span class="font-semibold text-slate-200">Reflection Report (10%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- CÔNG CỤ & NỀN TẢNG -->
+            <section class="mb-12 md:mb-16">
+                <h3 class="flex items-center text-3xl font-bold mb-8 text-slate-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 mr-3 text-sky-400">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m1-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" />
+                    </svg>
+                    Công cụ & Nền tảng
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700/50 shadow-lg">
+                        <h4 class="text-lg font-bold text-sky-300 mb-2">Tạo nội dung, ý tưởng</h4>
+                        <p class="text-slate-300">ChatGPT, Gemini, Notion AI</p>
+                    </div>
+                    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700/50 shadow-lg">
+                        <h4 class="text-lg font-bold text-indigo-300 mb-2">Thiết kế & trình bày</h4>
+                        <!-- Đã cập nhật theo yêu cầu trước đó -->
+                        <p class="text-slate-300">Canva Magic, Runway, Pika, HeyGen, Pomillo, Whisk</p>
+                    </div>
+                    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700/50 shadow-lg">
+                        <h4 class="text-lg font-bold text-purple-300 mb-2">Phân tích dữ liệu</h4>
+                        <p class="text-slate-300">ChatGPT Advanced Data, Excel Copilot</p>
+                    </div>
+                    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700/50 shadow-lg">
+                        <h4 class="text-lg font-bold text-fuchsia-300 mb-2">Nghiên cứu & học tập</h4>
+                        <p class="text-slate-300">Elicit.org, Scite.ai, Consensus, Perplexity</p>
+                    </div>
+                    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700/50 shadow-lg md:col-span-2 lg:col-span-1">
+                        <h4 class="text-lg font-bold text-rose-300 mb-2">Đạo đức & kiểm tra</h4>
+                        <p class="text-slate-300">Turnitin Draft Coach, Copyleaks AI Detector</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PHONG CÁCH & KẾT QUẢ (Layout 2 cột) -->
+            <section class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <!-- Cột 1: PHONG CÁCH HỌC TẬP -->
+                <div>
+                    <h3 class="flex items-center text-3xl font-bold mb-8 text-slate-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 mr-3 text-indigo-400">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 10.142A12.016 12.016 0 0112 11.25c-2.31 0-4.46-.72-6.228-1.928a.75.75 0 01-.64-1.332A12.01 12.01 0 0112 3c2.31 0 4.46.72 6.228 1.928a.75.75 0 01.64 1.332z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 11.25a3 3 0 01-3-3v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V8.25a3 3 0 01-3 3z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 11.25v6.75a3 3 0 003 3h3.75a3 3 0 003-3V11.25A3 3 0 0018.75 8.25h-3.75a3 3 0 00-3 3zM9 11.25v6.75a3 3 0 01-3 3H2.25a3 3 0 01-3-3V11.25a3 3 0 013-3h3.75a3 3 0 013 3z" />
+                        </svg>
+                        Phong cách học tập
+                    </h3>
+                    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700/50 shadow-lg space-y-4">
+                        <div class="text-center">
+                            <span class="text-5xl font-bold text-indigo-300">70%</span>
+                            <p class="text-xl text-slate-300">Thực hành (Hands-on)</p>
+                        </div>
+                        <div class="text-center">
+                            <span class="text-5xl font-bold text-slate-500">30%</span>
+                            <p class="text-xl text-slate-300">Lý thuyết (Concepts)</p>
+                        </div>
+                        <ul class="list-disc list-inside text-slate-300 space-y-2 pt-4">
+                            <li>Mỗi buổi = 1 trải nghiệm học tập (learn–do–reflect)</li>
+                            <li>Giảng viên đóng vai trò mentor / facilitator</li>
+                            <li>Triển khai offline hoặc hybrid (Google Classroom + AI tools)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Cột 2: KẾT QUẢ ĐẦU RA -->
+                <div>
+                    <h3 class="flex items-center text-3xl font-bold mb-8 text-slate-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 mr-3 text-purple-400">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5z" />
+                        </svg>
+                        Kết quả đầu ra
+                    </h3>
+                    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700/50 shadow-lg space-y-4">
+                        <div class="flex items-start">
+                            <span class="text-2xl mr-3">🎓</span>
+                            <div>
+                                <h4 class="font-semibold text-lg text-purple-300">Chứng chỉ</h4>
+                                <p class="text-slate-300">SBS Certificate of Applied AI & Innovation</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <span class="text-2xl mr-3">💼</span>
+                            <div>
+                                <h4 class="font-semibold text-lg text-purple-300">Portfolio</h4>
+                                <p class="text-slate-300">1 sản phẩm thực tế + 1 phản tư cá nhân</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <span class="text-2xl mr-3">🚀</span>
+                            <div>
+                                <h4 class="font-semibold text-lg text-purple-300">Trình bày tại</h4>
+                                <p class="text-slate-300">“SBS Innovation Showcase” hoặc hoạt động truyền thông trường</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+    <!-- NỘI DUNG MỚI: ROADMAP (Hidden by default) -->
+    <div id="roadmap" class="hidden">
+        <div class="container mx-auto max-w-7xl p-4 md:p-8 pt-20"> <!-- Thêm padding top và max-width lớn hơn -->
+            
+            <header class="text-center mb-12 md:mb-16">
+                <h1 class="text-4xl md:text-5xl font-extrabold gradient-text mb-4">
+                    SBS AI Learning Integration Roadmap
+                </h1>
+            </header>
+
+            <!-- Tab Navigation -->
+            <div class="mb-8 flex justify-center border-b border-slate-700">
+                <button id="tab-hospitality" class="tab-btn py-3 px-6 rounded-t-lg font-semibold transition-all bg-slate-700 text-white border-b-4 border-sky-400">
+                    🏨 Hospitality Management
+                </button>
+                <button id="tab-business" class="tab-btn py-3 px-6 rounded-t-lg font-semibold transition-all text-slate-400 border-b-4 border-transparent hover:text-white">
+                    💼 Business Management
+                </button>
+            </div>
+
+            <!-- Tab Content Panels -->
+            <div class="mb-16">
+                <!-- HOSPITALITY PANEL (Visible by default) -->
+                <div id="hospitality-content">
+                    <section class="bg-slate-800 p-6 rounded-2xl border-2 border-slate-700/50">
+                        <h2 class="text-3xl font-bold text-sky-400 mb-6">🏨 I. HOSPITALITY MANAGEMENT</h2>
+                        
+                        <div class="mb-6">
+                        <h3 class="text-xl font-semibold text-slate-100 mb-4">🔹 Giai đoạn 1 – Chuyển hóa nội dung</h3>
+                        <div class="bg-slate-700/30 p-4 rounded-lg mb-4">
+                            <h4 class="font-semibold text-sky-300">✳️ Chọn 3–5 học phần trọng tâm:</h4>
+                            <p class="text-slate-400 text-sm">Managing Customer Experience, Managing F&B Operations, Professional Identity & Practice, Hospitality Marketing Essentials, Managing Accommodation Services.</p>
+                        </div>
+                        <h4 class="font-semibold text-sky-300 mb-3">✳️ Chuyển hóa thành Learning Capsules:</h4>
+                        <div class="space-y-4">
+                            <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-slate-100">🎬 AI Video Lecture (5–7 phút)</h5>
+                                <p class="text-slate-300 text-sm mb-2">Tạo video AI giảng viên ảo mô phỏng tình huống: Check-in, Xử lý phàn nàn, Tư vấn menu.</p>
+                                <span class="text-xs font-mono text-indigo-300">Công cụ: HeyGen / Synthesia + Canva / Runway</span>
+                            </div>
+                            <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-slate-100">🧩 Interactive Quiz</h5>
+                                <p class="text-slate-300 text-sm mb-2">3–5 câu hỏi tình huống, mô phỏng phản ứng nghề nghiệp.</p>
+                                <span class="text-xs font-mono text-indigo-300">Công cụ: H5P / Genially</span>
+                            </div>
+                            <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-slate-100">💬 Chatbot Tutor – “AI Concierge Coach”</h5>
+                                <p class="text-slate-300 text-sm mb-2">Chatbot mô phỏng khách hàng & phản hồi sinh viên bằng kịch bản tiếng Anh.</p>
+                                <span class="text-xs font-mono text-indigo-300">Công cụ: ChatGPT API / Notion AI / Botpress</span>
+                            </div>
+                             <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-slate-100">🧠 AI Flashcards (Vocabulary & SOP)</h5>
+                                <p class="text-slate-300 text-sm mb-2">Flashcard ghi nhớ quy trình & từ vựng: “Guest request – SOP – Response”.</p>
+                                <span class="text-xs font-mono text-indigo-300">Công cụ: Quizlet + ChatGPT auto-generate</span>
+                            </div>
+                            <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-slate-100">🪄 Reflection Prompt</h5>
+                                <p class="text-slate-300 text-sm mb-2">Chatbot hỏi: “What would you do differently next time?”</p>
+                                <span class="text-xs font-mono text-indigo-300">Công cụ: ChatGPT Custom GPT</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Giai đoạn 2 -->
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold text-slate-100 mb-4">🔹 Giai đoạn 2 – Kết nối vào lớp học</h3>
+                        <div class="space-y-4">
+                            <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-slate-100">1️⃣ Pre-Class (Online)</h5>
+                                <p class="text-slate-300 text-sm">SV xem video + làm quiz + chat với “AI Concierge” để ôn SOP. (Tác động: Chuẩn bị sẵn kiến thức).</p>
+                            </div>
+                            <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-slate-100">2️⃣ In-Class (Offline)</h5>
+                                <p class="text-slate-300 text-sm">GV dẫn dắt thực hành case thật, role-play. (Tác động: Thời gian lớp học dùng cho thực hành).</p>
+                            </div>
+                            <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-slate-100">3️⃣ Post-Class (Online)</h5>
+                                <p class="text-slate-300 text-sm">SV ôn tập bằng flashcards và chatbot hỏi nhanh 5 phút/ngày. (Tác động: Củng cố nhớ lâu).</p>
+                            </div>
+                        </div>
+                         <p class="text-sm text-sky-300 mt-4 p-3 bg-sky-900/50 rounded-lg">✅ <span class="font-semibold">Điểm quá trình:</span> (a) Hoàn thành quiz, (b) Tương tác chatbot ≥ 2 lần/tuần, (c) Reflection mini.</p>
+                    </div>
+                    
+                    <!-- Giai đoạn 3 -->
+                    <div>
+                        <h3 class="text-xl font-semibold text-slate-100 mb-3">🔹 Giai đoạn 3 – Ứng dụng mở rộng</h3>
+                        <ul class="list-disc list-inside text-slate-300 space-y-2">
+                            <li><span class="font-semibold">AI Guest Simulation Project:</span> sinh viên tạo chatbot khách ảo mô phỏng tình huống thật.</li>
+                            <li><span class="font-semibold">AI Mentor Feedback:</span> chatbot phản hồi kỹ năng giao tiếp bằng giọng Anh – kèm đánh giá rubric.</li>
+                            <li><span class="font-semibold">Leaderboard:</span> hệ thống theo dõi số lần hoàn thành quiz/flashcard → gamify học tập.</li>
+                        </ul>
+                    </div>
+
+                </section>
+                </div>
+                
+                <!-- BUSINESS PANEL (Hidden by default) -->
+                <div id="business-content" class="hidden">
+                <section class="bg-slate-800 p-6 rounded-2xl border-2 border-slate-700/50">
+                    <h2 class="text-3xl font-bold text-purple-400 mb-6">💼 II. BUSINESS MANAGEMENT</h2>
+                    
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold text-slate-100 mb-3">🎯 Mục tiêu chuyên ngành</h3>
+                        <ul class="list-disc list-inside text-slate-300 space-y-2">
+                            <li>Hình thành tư duy phân tích – ra quyết định – sáng tạo chiến lược với AI.</li>
+                            <li>Học qua mô phỏng doanh nghiệp, tình huống ra quyết định và phân tích dữ liệu.</li>
+                            <li>Ứng dụng AI như trợ lý kinh doanh cá nhân (AI Business Coach).</li>
+                        </ul>
+                    </div>
+
+                    <!-- Giai đoạn 1 -->
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold text-slate-100 mb-4">🔹 Giai đoạn 1 – Chuyển hóa nội dung</h3>
+                        <div class="bg-slate-700/30 p-4 rounded-lg mb-4">
+                            <h4 class="font-semibold text-purple-300">✳️ Chọn 3–5 học phần trọng tâm:</h4>
+                            <p class="text-slate-400 text-sm">Marketing Processes & Planning, Leadership & Management, Human Resource Management, Accounting Principles, Global Business Environment.</p>
+                        </div>
+                        <h4 class="font-semibold text-purple-300 mb-3">✳️ Chuyển hóa thành AI Business Capsules:</h4>
+                        <div class="space-y-4">
+                            <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-slate-100">🎬 AI Explainer Video (5–8 phút)</h5>
+                                <p class="text-slate-300 text-sm mb-2">Video minh họa mô hình thực tế: Marketing Funnel, SWOT, 4Ps, HR cycle, P&L basics.</p>
+                                <span class="text-xs font-mono text-indigo-300">Công cụ: Runway, Pika, HeyGen</span>
+                            </div>
+                            <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-slate-100">🧩 Interactive Business Quiz</h5>
+                                <p class="text-slate-300 text-sm mb-2">Quiz theo case study: “CEO decision”, “Budget choice”, “Leadership dilemma”.</p>
+                                <span class="text-xs font-mono text-indigo-300">Công cụ: H5P / Articulate Rise</span>
+                            </div>
+                            <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-slate-100">💬 Chatbot Coach – “AI Business Partner”</h5>
+                                <p class="text-slate-300 text-sm mb-2">Chatbot đóng vai cố vấn doanh nghiệp: “Tư vấn Marketing / HR / Leadership”.</p>
+                                <span class="text-xs font-mono text-indigo-300">Công cụ: ChatGPT Custom GPT / Botpress</span>
+                            </div>
+                             <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-slate-100">🧠 AI Flashcards (Concepts & Models)</h5>
+                                <p class="text-slate-300 text-sm mb-2">Tự tạo flashcard từ lý thuyết (Porter, Maslow, 4Ps, SWOT…).</p>
+                                <span class="text-xs font-mono text-indigo-300">Công cụ: Quizlet auto-gen by ChatGPT</span>
+                            </div>
+                            <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-slate-100">🪄 Mini Simulation</h5>
+                                <p class="text-slate-300 text-sm mb-2">Chatbot mô phỏng hội thoại ra quyết định (VD: “Bạn chọn chiến lược nào?”).</p>
+                                <span class="text-xs font-mono text-indigo-300">Công cụ: FlowGPT / ChatGPT API</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Giai đoạn 2 -->
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold text-slate-100 mb-4">🔹 Giai đoạn 2 – Kết nối vào lớp học</h3>
+                        <div class="space-y-4">
+                            <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-slate-100">1️⃣ Pre-Class (Online)</h5>
+                                <p class="text-slate-300 text-sm">SV xem video + làm quiz + trò chuyện với “AI Business Partner”. (Tác động: Đến lớp đã hiểu khái niệm).</p>
+                            </div>
+                            <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-slate-100">2️⃣ In-Class (Offline)</h5>
+                                <p class="text-slate-300 text-sm">GV tổ chức workshop / group simulation: “Ra quyết định theo case”. (Tác động: Tập trung 100% vào ứng dụng).</p>
+                            </div>
+                            <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-slate-100">3️⃣ Post-Class (Online)</h5>
+                                <p class="text-slate-300 text-sm">Flashcards + chatbot hỏi nhanh 5 câu/ngày + feedback tự động. (Tác động: Tăng retention & kết nối thực tế).</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-purple-300 mt-4 p-3 bg-purple-900/50 rounded-lg">✅ <span class="font-semibold">Điểm quá trình:</span> 30% hoạt động online (quiz, chatbot, flashcard), 70% hoạt động lớp & project teamwork.</p>
+                    </div>
+                    
+                    <!-- Giai đoạn 3 -->
+                    <div>
+                        <h3 class="text-xl font-semibold text-slate-100 mb-3">🔹 Giai đoạn 3 – Ứng dụng mở rộng</h3>
+                        <ul class="list-disc list-inside text-slate-300 space-y-2">
+                            <li><span class="font-semibold">AI Case Project:</span> sinh viên dùng ChatGPT + Canva/Excel để phân tích 1 vấn đề thật (thị trường, chiến lược...).</li>
+                            <li><span class="font-semibold">AI Coach Reflection:</span> chatbot phản hồi theo rubric Bloom (hiểu – phân tích – sáng tạo).</li>
+                            <li><span class="font-semibold">Learning Analytics:</span> hệ thống theo dõi lượng flashcard và quiz → phân nhóm học tập.</li>
+                        </ul>
+                    </div>
+
+                </section>
+                </div>
+            </div>
+
+            <!-- PHẦN CHUNG: CHATBOT & LỘ TRÌNH -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+                <!-- CỘT 1+2: CHATBOT & FLASHCARD SYSTEM -->
+                <section class="lg:col-span-2">
+                    <h2 class="text-3xl font-bold text-fuchsia-400 mb-6">🤖 Chatbot & Flashcard System Design</h2>
+                    
+                    <div class="bg-slate-800 p-6 rounded-2xl border-2 border-slate-700/50 mb-6">
+                        <h3 class="text-xl font-semibold text-slate-100 mb-3">🧠 1. Chatbot cá nhân hóa (Custom GPT)</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-slate-100">Q&A theo học phần</h5>
+                                <p class="text-slate-300 text-sm">Giải thích khái niệm, cho ví dụ, tạo bài tập nhỏ.</p>
+                            </div>
+                            <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-slate-100">Quiz-based dialogue</h5>
+                                <p class="text-slate-300 text-sm">Chatbot hỏi ngẫu nhiên 3–5 câu / ngày.</p>
+                            </div>
+                            <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-slate-100">Case roleplay</h5>
+                                <p class="text-slate-300 text-sm">“Đóng vai khách / nhân viên / manager” để luyện kỹ năng.</p>
+                            </div>
+                             <div class="p-4 bg-slate-700/50 rounded-lg">
+                                <h5 class="font-bold text-slate-100">Reflection support</h5>
+                                <p class="text-slate-300 text-sm">Nhắc nhở sinh viên viết “learning reflection” cuối tuần.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800 p-6 rounded-2xl border-2 border-slate-700/50">
+                        <h3 class="text-xl font-semibold text-slate-100 mb-3">🧩 2. Flashcard System</h3>
+                        <ul class="list-disc list-inside text-slate-300 space-y-2 mb-3">
+                            <li>Tự động tạo flashcards từ video / transcript AI.</li>
+                            <li>Kết nối trực tiếp với chatbot: “Ôn lại 5 thẻ hôm nay nhé.”</li>
+                            <li>Học theo spaced repetition (mức độ nhớ – quên).</li>
+                        </ul>
+                        <span class="text-xs font-mono text-indigo-300">Công cụ: Quizlet API + ChatGPT automation.</span>
+                    </div>
+                </section>
+
+                <!-- CỘT 3: LỘ TRÌNH TRIỂN KHAI -->
+                <section>
+                    <h2 class="text-3xl font-bold text-teal-400 mb-6">🧭 3. Lộ trình triển khai</h2>
+                    <div class="bg-slate-800 p-6 rounded-2xl border-2 border-slate-700/50">
+                        <div class="space-y-4">
+                            <div class="p-4 bg-slate-700/50 rounded-lg border-l-4 border-teal-500">
+                                <h5 class="font-bold text-slate-100">P1: Pilot (Q1/2026)</h5>
+                                <p class="text-slate-300 text-sm">2 môn Business + 1 môn Hospitality.</p>
+                                <p class="text-teal-300 text-sm font-semibold">Kết quả: 3 video AI + quiz + chatbot demo / môn.</p>
+                            </div>
+                             <div class="p-4 bg-slate-700/50 rounded-lg border-l-4 border-sky-500">
+                                <h5 class="font-bold text-slate-100">P2: Scale-up (Q2–Q3/2026)</h5>
+                                <p class="text-slate-300 text-sm">Toàn bộ môn L4.</p>
+                                <p class="text-sky-300 text-sm font-semibold">Kết quả: Thêm flashcards & chatbot phản hồi.</p>
+                            </div>
+                             <div class="p-4 bg-slate-700/50 rounded-lg border-l-4 border-purple-500">
+                                <h5 class="font-bold text-slate-100">P3: Full Integration (2027)</h5>
+                                <p class="text-slate-300 text-sm">Mọi môn L4–L5.</p>
+                                <p class="text-purple-300 text-sm font-semibold">Kết quả: LMS đồng bộ + hệ thống phân tích học tập.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- SCRIPT ĐIỀU HƯỚNG -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Lấy các phần tử chính
+            const mainMenu = document.getElementById('main-menu');
+            const coreAiDiv = document.getElementById('core-ai-program');
+            const roadmapDiv = document.getElementById('roadmap');
+            
+            // Lấy các nút bấm
+            const showCoreAiBtn = document.getElementById('show-core-ai');
+            const showRoadmapBtn = document.getElementById('show-roadmap');
+            const backButtons = document.querySelectorAll('.back-to-menu');
+            const mainBackButton = backButtons[0]; // Nút back chung
+
+            // Hàm ẩn tất cả các trang con và nút back
+            function hideAll() {
+                mainMenu.classList.add('hidden');
+                coreAiDiv.classList.add('hidden');
+                roadmapDiv.classList.add('hidden');
+                mainBackButton.classList.add('hidden');
+            }
+
+            // Hàm hiển thị một trang cụ thể
+            function showSection(sectionElement) {
+                hideAll();
+                sectionElement.classList.remove('hidden');
+                // Nếu không phải là menu chính, hiển thị nút back
+                if (sectionElement !== mainMenu) {
+                    mainBackButton.classList.remove('hidden');
+                }
+                window.scrollTo(0, 0); // Cuộn lên đầu trang
+            }
+
+            // Gán sự kiện cho các nút
+            showCoreAiBtn.addEventListener('click', () => {
+                showSection(coreAiDiv);
+            });
+
+            showRoadmapBtn.addEventListener('click', () => {
+                showSection(roadmapDiv);
+            });
+
+            // Gán sự kiện cho nút "Quay lại Menu"
+            // Vì chỉ có 1 nút back chung nên không cần querySelectorAll
+            mainBackButton.addEventListener('click', () => {
+                showSection(mainMenu);
+            });
+
+            // --- Tab Logic for Roadmap ---
+            const tabHospitalityBtn = document.getElementById('tab-hospitality');
+            const tabBusinessBtn = document.getElementById('tab-business');
+            const hospitalityContent = document.getElementById('hospitality-content');
+            const businessContent = document.getElementById('business-content');
+    
+            if (tabHospitalityBtn && tabBusinessBtn && hospitalityContent && businessContent) {
+                
+                tabHospitalityBtn.addEventListener('click', () => {
+                    // Show Content
+                    hospitalityContent.classList.remove('hidden');
+                    businessContent.classList.add('hidden');
+                    
+                    // Style Active Tab (Hospitality)
+                    tabHospitalityBtn.classList.add('bg-slate-700', 'text-white', 'border-sky-400');
+                    tabHospitalityBtn.classList.remove('text-slate-400', 'border-transparent');
+                    
+                    // Style Inactive Tab (Business)
+                    tabBusinessBtn.classList.add('text-slate-400', 'border-transparent');
+                    tabBusinessBtn.classList.remove('bg-slate-700', 'text-white', 'border-purple-400');
+                });
+    
+                tabBusinessBtn.addEventListener('click', () => {
+                    // Show Content
+                    businessContent.classList.remove('hidden');
+                    hospitalityContent.classList.add('hidden');
+                    
+                    // Style Active Tab (Business)
+                    tabBusinessBtn.classList.add('bg-slate-700', 'text-white', 'border-purple-400');
+                    tabBusinessBtn.classList.remove('text-slate-400', 'border-transparent');
+                    
+                    // Style Inactive Tab (Hospitality)
+                    tabHospitalityBtn.classList.add('text-slate-400', 'border-transparent');
+                    tabHospitalityBtn.classList.remove('bg-slate-700', 'text-white', 'border-sky-400');
+                });
+            }
+            // --- End of Tab Logic ---
+
+            // Trạng thái ban đầu: chỉ hiển thị main menu
+            showSection(mainMenu);
+        });
+    </script>
+
+</body>
+</html>
